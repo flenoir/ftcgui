@@ -68,7 +68,7 @@ tree = etree.fromstring(response.content)
 
 print('Number of cluster in the farm :', tree[1].attrib['HasCluster'], ' - number of CPU :', tree[1].attrib['CPUs'])
 
-response2 = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/?Status=All')
+response2 = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/?Status=All&SortBy=SubmitTime&Orderby=Desc')
 
 tree2 = etree.fromstring(response2.content)
 
