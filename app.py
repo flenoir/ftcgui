@@ -54,6 +54,7 @@ def ping_pong():
 # Jobs route
 @app.route('/jobs', methods=['GET'])
 def all_jobs():
+    JOBS = request_data_from_jobs(request_current_jobs())
     return jsonify({
         'status': 'success',
         'jobs': JOBS
@@ -68,44 +69,55 @@ tree = etree.fromstring(response.content)
 
 print('Number of cluster in the farm :', tree[1].attrib['HasCluster'], ' - number of CPU :', tree[1].attrib['CPUs'])
 
-response2 = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/?Status=All&SortBy=SubmitTime&Orderby=Desc')
-
-tree2 = etree.fromstring(response2.content)
-
-current_jobs = []
-# job_list = []
+# -----------------------------------------------------   
 
 
-
-for i in tree2.iter('Job'):
-  # print(i.tag, i.attrib['ID'])
-  current_jobs.append(i.attrib['ID'])
-
-
-# print(current_jobs)
-
-for j in current_jobs:
-  getJobsInfos = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/{}/?Content=Description'.format(j))
-  # print('jobs => ', getJobsInfos.content)
-  tree_jobs = etree.fromstring(getJobsInfos.content)
-
-  for job in tree_jobs.iter('JobDescInfo'):
-    job_dict = {}
-    # print('description', job.tag, job.attrib['Description'])
-    # print('job_id', job.tag, job.attrib['JobID'])
-    job_dict['Submit_Time'] = job.attrib['SubmissionTime']
-    job_dict['Status'] = job.attrib['Status']
-    job_dict['Progress'] = job.attrib['Priority']
-    job_dict['Source'] = job.attrib['SourceFilename']
-    job_dict['Output'] = job.attrib['OutputFilename']
-    job_dict['Priority'] = job.attrib['Priority']
-    job_dict['End_Time'] = job.attrib['EndTime']
-    JOBS.append(job_dict)
+def request_current_jobs():
+    current_jobs = []
+    response2 = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/?Status=All&SortBy=SubmitTime&Orderby=Desc')
+    tree2 = etree.fromstring(response2.content)
 
 
+    for i in tree2.iter('Job'):
+        # print(i.tag, i.attrib['ID'])
+        current_jobs.append(i.attrib['ID'])
+    
+    return current_jobs
+
+    
+def request_data_from_jobs(current_jobs):
+    DJOBS = []
+    for j in current_jobs:
+        getJobsInfos = requests.get('http://10.0.0.106:8647/CambriaFC/v1/Jobs/{}/?Content=Description'.format(j))
+        # print('jobs => ', getJobsInfos.content)
+        tree_jobs = etree.fromstring(getJobsInfos.content)
+        job_dict = {}
+
+        for job in tree_jobs.iter('JobDescInfo'):
+            
+            job_dict['Submit_Time'] = job.attrib['SubmissionTime']
+            job_dict['Status'] = job.attrib['Status']
+            job_dict['Progress'] = job.attrib['Priority']
+            job_dict['Source'] = job.attrib['SourceFilename']
+            job_dict['Output'] = job.attrib['OutputFilename']
+            job_dict['Priority'] = job.attrib['Priority']
+            job_dict['End_Time'] = job.attrib['EndTime']
+            # DJOBS.append(job_dict)
+
+        for x in tree_jobs.iter('Task'):
+            # print(x.tag, x.attrib['Progress'])
+            job_dict['Progress'] = x.attrib['Progress']
+            DJOBS.append(job_dict)
+            # print('job_id', job.tag, job.attrib['JobID'])
+    
+    # print(DJOBS)  
+    return DJOBS
+
+# JOBS = request_data_from_jobs(request_current_jobs())
+# print(JOBS)
 
 
-# ----------------------
+
 
 if __name__ == '__main__':
     app.run(port=5001)

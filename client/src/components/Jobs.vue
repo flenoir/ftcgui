@@ -12,7 +12,6 @@
         </a>
         <button type="button" class="btn btn-success btn-sm">Add Job</button>
       </nav>
-      <!-- <br><br> -->
     </div>
 
     <div class="row">
@@ -40,17 +39,18 @@
               <td v-if="job.Status == 'running'" class="text-warning">{{ job.Status }}</td>
               <td v-else-if="job.Status == 'errored'" class="text-danger">{{ job.Status }}</td>
               <td v-else class="text-success">{{ job.Status }}</td>
-              <td>{{ job.Progress }}</td>
+              <td>
+              <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" :aria-valuenow="job.Progress" aria-valuemin="0" aria-valuemax="100" :style="{'width': `${job.Progress}%`}">
+              {{ job.Progress }}%
+              </div>
+              </div>
+              </td>
               <td>{{ job.Source}}</td>
               <td>{{ job.Output }}</td>
               <td>{{ job.Priority }}</td>
               <td>{{ job.End_Time}}</td>
-              <!-- <td>
-                <span v-if="job.read">Yes</span>
-                <span v-else>No</span>
-              </td> -->
               <td>
-                <!-- <button type="button" class="btn btn-warning btn-sm">Update</button> -->
                 <button type="button" class="btn btn-danger btn-sm">Delete</button>
               </td>
             </tr>
@@ -73,17 +73,8 @@ export default {
   methods: {
     getJobs() {
       const path = 'http://localhost:5001/jobs';
-    //    setInterval(() => {
-    //    axios.get(path)
-    //     .then((res) => {
-    //       this.jobs = res.data.jobs;
-    //     })
-    //     .catch((error) => {
-    //       // eslint-disable-next-line
-    //       console.error(error);
-    //     });
-    // }, 30000)
-      axios.get(path)
+       setInterval(() => {
+       axios.get(path)
         .then((res) => {
           this.jobs = res.data.jobs;
         })
@@ -91,6 +82,15 @@ export default {
           // eslint-disable-next-line
           console.error(error);
         });
+    }, 30000);
+      // axios.get(path)
+      //   .then((res) => {
+      //     this.jobs = res.data.jobs;
+      //   })
+      //   .catch((error) => {
+      //     // eslint-disable-next-line
+      //     console.error(error);
+      //   });
     },
   },
   created() {
