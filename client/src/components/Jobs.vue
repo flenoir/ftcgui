@@ -68,30 +68,38 @@
             hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
       <b-form-group id="form-title-group"
-                    label="Title:"
+                    label="Source file:"
                     label-for="form-title-input">
           <b-form-input id="form-title-input"
                         type="text"
-                        v-model="addJobForm.title"
+                        accept=".ts, .mxf, .mov"
+                        v-model="addJobForm.sourceFile"
+                        :state="Boolean(addJobForm.sourceFile)"
                         required
-                        placeholder="Enter title">
+                        placeholder="Select file to transcode">
           </b-form-input>
+          <p>Selected file: {{addJobForm.sourceFile}}</p>
         </b-form-group>
         <b-form-group id="form-author-group"
                       label="Author:"
                       label-for="form-author-input">
             <b-form-input id="form-author-input"
                           type="text"
-                          v-model="addJobForm.author"
-                          required
-                          placeholder="Enter author">
+                          v-model="addJobForm.outputFolder"
+                          placeholder="Enter destination folder">
             </b-form-input>
+            <p>Selected folder: {{addJobForm.outputFolder}}</p>
           </b-form-group>
         <b-form-group id="form-read-group">
           <b-form-checkbox-group v-model="addJobForm.read" id="form-checks">
             <b-form-checkbox value="true">Read?</b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
+            <b-form-select v-model="addJobForm.SelectedPreset">
+                <option :value="null">Please select an option</option>
+                <option value="preset1">Preset 1</option>
+                <option value="preset2">Preset 2</option>
+            </b-form-select>
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
@@ -133,7 +141,7 @@ export default {
     },
     // add jobs
     addJob(payload) {
-        const path = 'http://localhost:5000/books';
+        const path = 'http://localhost:5001/jobs';
         axios.post(path, payload)
           .then(() => {
             this.getJobs();
@@ -145,9 +153,10 @@ export default {
           });
       },
     initForm() {
-        this.addJobForm.title = '';
-        this.addJobForm.author = '';
-        this.addJobForm.read = [];
+        this.addJobForm.sourceFile = '';
+        this.addJobForm.outputFolder = '';
+        // this.addJobForm.read = [];
+        this.addJobForm.SelectedPreset = "";
     },
     onSubmit(evt) {
         evt.preventDefault();
@@ -155,9 +164,10 @@ export default {
         let read = false;
         if (this.addJobForm.read[0]) read = true;
         const payload = {
-          title: this.addJobForm.title,
-          author: this.addJobForm.author,
+          source: this.addJobForm.sourceFile,
+          output: this.addJobForm.outputFolder,
           read, // property shorthand
+          preset: this.addJobForm.SelectedPreset,
         };
         this.addJob(payload);
         this.initForm();

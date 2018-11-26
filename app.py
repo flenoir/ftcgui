@@ -2,8 +2,11 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 from xml.etree import ElementTree as etree
+from presets import presets_list
 
 JOBS =[]
+
+print(presets_list['preset1']) # import du preset1 depuis le fichier des presets
 
 # JOBS = [
 #     {
@@ -65,14 +68,17 @@ def ping_pong():
 @app.route('/jobs', methods=['GET', 'POST'])
 def all_jobs():
     JOBS = request_data_from_jobs(request_current_jobs())
-    response_object = {'status': 'success', 'jobs': JOBS}
+    response_object = {'status': 'success', 'jobs': JOBS, 'presets': presets_list}
     if request.method == 'POST':
         post_data = request.get_json()
-        print(post_data.get('title'))
+        print(post_data.get('source'))
+        print(post_data.get('output'))
+        print(post_data.get('preset'))
         # JOBS.append({
         #     'title': post_data.get('title')
         # })
         response_object['message'] = 'Job added!'
+        post_encoding_job(post_data.get('source'),post_data.get('output'), post_data.get('preset'))
     else:
         response_object['jobs'] = JOBS
     return jsonify(response_object)
@@ -138,6 +144,35 @@ def request_data_from_jobs(current_jobs):
             # print('job_id', job.tag)
       
     return DJOBS
+
+
+def post_encoding_job(source_file,output_folder, preset):
+
+        # launch a job
+    url = "http://10.0.0.106:8647/CambriaFC/v1/Jobs"
+
+    payload = r'<JobDescr Priority="5" NumberOfRetries="1" Description="Test Job" Submitter="10.12.0.155" OutputFolder="{}" OutputBasename="%sourcePath0%_%presetName%">\
+            <Job Type="MediaGeneric">\
+            # --> replace encoding preset \
+            {}\
+            # --> replace encoding preset \
+                <Source Location="{}" Name="Src1" />\
+            </Job>\
+    </JobDescr>'.format(output_folder, presets_list[preset], source_file)
+
+    print(payload)
+
+    headers = {
+        'content-type': "application/x-www-form-urlencoded",
+        'cache-control': "no-cache",
+        'postman-token': "0e53a64e-eba2-bdf6-60df-f3b1dd61b054"
+        }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    print(response.text)
+    # print("out", output_folder, "and source file", source_file)
+
 
 
 if __name__ == '__main__':
