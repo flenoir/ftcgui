@@ -3,10 +3,11 @@ from flask_cors import CORS
 import requests
 from xml.etree import ElementTree as etree
 from presets import presets_list
+import re
 
 JOBS =[]
 
-print(presets_list['preset1']) # import du preset1 depuis le fichier des presets
+# print(presets_list['preset1']) # import du preset1 depuis le fichier des presets
 
 # JOBS = [
 #     {
@@ -78,7 +79,7 @@ def all_jobs():
         #     'title': post_data.get('title')
         # })
         response_object['message'] = 'Job added!'
-        post_encoding_job(post_data.get('source'),post_data.get('output'), post_data.get('preset'))
+        post_encoding_job(post_data.get('source'),post_data.get('output'), post_data.get('preset'), presets_list)
     else:
         response_object['jobs'] = JOBS
     return jsonify(response_object)
@@ -145,8 +146,18 @@ def request_data_from_jobs(current_jobs):
       
     return DJOBS
 
+# regex = re.findall(r'(?<=OutputFilenameExtension)(.{5})', presets_list['preset2'])
 
-def post_encoding_job(source_file,output_folder, preset):
+
+# print("the regex is", str(regex)[4:-2])
+# temp_preset = presets_list["preset2"].format(output_folder +'\\'+"tototo."+str(regex)[4:-2])
+
+def post_encoding_job(source_file,output_folder, preset, presets_list):
+
+    regex = re.findall(r'(?<=OutputFilenameExtension)(.{5})', presets_list['preset2'])
+
+    print("the regex is", str(regex)[4:-2])
+    temp_preset = presets_list["preset2"].format(output_folder +'\\'+"tototo."+str(regex)[4:-2])
 
         # launch a job
     url = "http://10.0.0.106:8647/CambriaFC/v1/Jobs"
@@ -158,7 +169,7 @@ def post_encoding_job(source_file,output_folder, preset):
             # --> replace encoding preset \
                 <Source Location="{}" Name="Src1" />\
             </Job>\
-    </JobDescr>'.format(output_folder, presets_list[preset], source_file)
+    </JobDescr>'.format(output_folder, temp_preset, source_file)
 
     print(payload)
 

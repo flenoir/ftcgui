@@ -18,39 +18,40 @@
       <div class="col-sm-12">
         <!-- job board display -->
 
+
         <br><br>
         <table class="table table-hover table-dark table-striped table-hover table-sm">
           <thead>
-            <tr>
-              <th scope="col">Submission Time</th>
-              <th scope="col">Status</th>
-              <th scope="col">Progress</th>
-              <th scope="col">Source</th>
-              <th scope="col">Output</th>
-              <th scope="col">Priority</th>
-              <th scope="col">End Time</th>
-              <th scope="col">Job ID</th>
+            <tr class="d-flex">
+              <th  class="col-sm-1 "scope="col">Submission Time</th>
+              <th  class="col-1" scope="col">Status</th>
+              <th  class="col-1" scope="col">Progress</th>
+              <th  class="col-2" scope="col">Source</th>
+              <th  class="col-2" scope="col">Output</th>
+              <th  class="col-1" scope="col">Priority</th>
+              <th  class="col-1" scope="col">End Time</th>
+              <!-- <th  class="col-1" scope="col">Job ID</th> -->
               <th></th>
             </tr>
           </thead>
           <tbody>
-           <tr v-for="(job, index) in jobs" :key="index">
-              <td>{{ job.Submit_Time }}</td>
-              <td v-if="job.Status == 'running'" class="text-warning">{{ job.Status }}</td>
-              <td v-else-if="job.Status == 'errored'" class="text-danger">{{ job.Status }}</td>
-              <td v-else class="text-success">{{ job.Status }}</td>
-              <td>
+           <tr class="d-flex" v-for="(job, index) in jobs" :key="index">
+              <td class="col-sm-1">{{ job.Submit_Time }}</td>
+              <td  v-if="job.Status == 'running'" class="text-warning col-1">{{ job.Status }}</td>
+              <td v-else-if="job.Status == 'errored'" class="text-danger col-1">{{ job.Status }}</td>
+              <td v-else class="text-success col-1">{{ job.Status }}</td>
+              <td class="col-1">
               <div class="progress">
               <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" :aria-valuenow="job.Progress" aria-valuemin="0" aria-valuemax="100" :style="{'width': `${job.Progress}%`}">
               {{ job.Progress }}%
               </div>
               </div>
               </td>
-              <td>{{ job.Source}}</td>
-              <td>{{ job.Output }}</td>
-              <td>{{ job.Priority }}</td>
-              <td>{{ job.End_Time}}</td>
-              <td>{{ job.JobID}}</td>
+              <td class="col-2" style="white-space: nowrap; overflow:hidden; text-overflow: ellipsis;">{{ job.Source}}</td>
+              <td class="col-2" style="white-space: nowrap; overflow:hidden; text-overflow: ellipsis;">{{ job.Output }}</td>
+              <td class="col-1">{{ job.Priority }}</td>
+              <td class="col-1">{{ job.End_Time}}</td>
+              <!-- <td class="col-1">{{ job.JobID}}</td> -->
               <td>
                 <button type="button" class="btn btn-danger btn-sm" @click="onDeleteJob(job)">Delete</button>
               </td>
