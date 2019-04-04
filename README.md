@@ -16,4 +16,4 @@ start npm in folder **C:\code\python\ftcgui\client** with command **npm run dev*
 
 
 
-Opne Browser on url : http://127.0.0.1:8080/
+Open Browser on url : http://127.0.0.1:8080/
